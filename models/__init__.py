@@ -1,4 +1,4 @@
-from .magical_schools import *
+from .schools import *
 from .wizards import *
 from .spells import *
 from .books import *

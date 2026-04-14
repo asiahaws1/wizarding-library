@@ -1,11 +1,9 @@
 from flask import Flask
+import psycopg2
 import os
 
 from db import *
-from controllers.schools_controller import schools_bp
-from controllers.spells_controller import spells_bp
-from controllers.books_controller import books_bp
-from controllers.wizards_controller import wizards_bp
+import routes
 from models import *
 
 
@@ -21,17 +19,15 @@ database_name = os.environ.get("DATABASE_NAME")
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    f"{database_scheme}{database_user}@{database_address}:{database_port}/{database_name}"
-)
+app.config["SQLALCHEMY_DATABASE_URI"] = f"{database_scheme}{database_user}@{database_address}:{database_port}/{database_name}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 init_db(app, db)
 
-app.register_blueprint(schools_bp)
-app.register_blueprint(spells_bp)
-app.register_blueprint(books_bp)
-app.register_blueprint(wizards_bp)
+app.register_blueprint(routes.school)
+app.register_blueprint(routes.spell)
+app.register_blueprint(routes.book)
+app.register_blueprint(routes.wizard)
 
 
 def create_tables():

@@ -1,16 +1,13 @@
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from db import db
-from models.magical_schools import MagicalSchool
+from models.schools import School
 from models.wizards import Wizard
 from models.books import Book
 
-schools_bp = Blueprint("schools", __name__)
 
-
-@schools_bp.route("/school", methods=["POST"])
 def create_school():
     post_data = request.form if request.form else request.get_json() or {}
     fields = ["school_name", "location", "founded_year", "headmaster"]
@@ -21,7 +18,7 @@ def create_school():
         if field in required_fields and not field_data:
             return jsonify({"message": f"{field} is required"}), 400
         values[field] = field_data
-    school = MagicalSchool(
+    school = School(
         school_name=values["school_name"],
         location=values["location"],
         founded_year=values["founded_year"],
@@ -43,9 +40,8 @@ def create_school():
     return jsonify({"message": "school created", "result": school_result}), 201
 
 
-@schools_bp.route("/schools", methods=["GET"])
 def get_schools():
-    query = db.session.query(MagicalSchool).all()
+    query = db.session.query(School).all()
     schools = []
     for school in query:
         schools.append(
@@ -60,13 +56,12 @@ def get_schools():
     return jsonify({"message": "schools found", "results": schools}), 200
 
 
-@schools_bp.route("/school/<school_id>", methods=["GET"])
 def get_school(school_id):
     try:
         school_uuid = uuid.UUID(school_id)
     except ValueError:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
-    query = db.session.query(MagicalSchool).filter(MagicalSchool.school_id == school_uuid).first()
+    query = db.session.query(School).filter(School.school_id == school_uuid).first()
     if not query:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
     school_result = {
@@ -79,14 +74,13 @@ def get_school(school_id):
     return jsonify({"message": "school found", "result": school_result}), 200
 
 
-@schools_bp.route("/school/<school_id>", methods=["PUT"])
 def update_school(school_id):
     post_data = request.form if request.form else request.get_json() or {}
     try:
         school_uuid = uuid.UUID(school_id)
     except ValueError:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
-    query = db.session.query(MagicalSchool).filter(MagicalSchool.school_id == school_uuid).first()
+    query = db.session.query(School).filter(School.school_id == school_uuid).first()
     if not query:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
     query.school_name = post_data.get("school_name", query.school_name)
@@ -98,7 +92,7 @@ def update_school(school_id):
     except Exception:
         db.session.rollback()
         return jsonify({"message": "unable to update record"}), 400
-    updated = db.session.query(MagicalSchool).filter(MagicalSchool.school_id == school_uuid).first()
+    updated = db.session.query(School).filter(School.school_id == school_uuid).first()
     school_result = {
         "school_id": str(updated.school_id),
         "school_name": updated.school_name,
@@ -109,13 +103,12 @@ def update_school(school_id):
     return jsonify({"message": "school updated", "result": school_result}), 200
 
 
-@schools_bp.route("/school/delete/<school_id>", methods=["DELETE"])
 def delete_school(school_id):
     try:
         school_uuid = uuid.UUID(school_id)
     except ValueError:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
-    query = db.session.query(MagicalSchool).filter(MagicalSchool.school_id == school_uuid).first()
+    query = db.session.query(School).filter(School.school_id == school_uuid).first()
     if not query:
         return jsonify({"message": f"school by id {school_id} does not exist"}), 404
     books = db.session.query(Book).filter(Book.school_id == school_uuid).all()

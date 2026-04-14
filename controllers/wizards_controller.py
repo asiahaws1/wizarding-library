@@ -1,17 +1,14 @@
 from datetime import datetime
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from db import db
 from models.wizards import Wizard
 from models.wizard_specializations import WizardSpecialization
 from models.spells import Spell
 
-wizards_bp = Blueprint("wizards", __name__)
 
-
-@wizards_bp.route("/wizard", methods=["POST"])
 def create_wizard():
     post_data = request.form if request.form else request.get_json() or {}
     fields = ["school_id", "wizard_name", "house", "year_enrolled", "magical_power_level", "active"]
@@ -54,7 +51,6 @@ def create_wizard():
     return jsonify({"message": "wizard created", "result": wizard_result}), 201
 
 
-@wizards_bp.route("/wizards", methods=["GET"])
 def get_wizards():
     query = db.session.query(Wizard).all()
     wizards = []
@@ -73,7 +69,6 @@ def get_wizards():
     return jsonify({"message": "wizards found", "results": wizards}), 200
 
 
-@wizards_bp.route("/wizards/active", methods=["GET"])
 def get_active_wizards():
     query = db.session.query(Wizard).filter(Wizard.active == True).all()
     wizards = []
@@ -92,7 +87,6 @@ def get_active_wizards():
     return jsonify({"message": "active wizards found", "results": wizards}), 200
 
 
-@wizards_bp.route("/wizards/<value>", methods=["GET"])
 def get_wizards_dynamic(value):
     if len(value) == 36:
         try:
@@ -146,7 +140,6 @@ def get_wizards_dynamic(value):
     return jsonify({"message": "wizards found", "results": wizards}), 200
 
 
-@wizards_bp.route("/wizard/<wizard_id>", methods=["PUT"])
 def update_wizard(wizard_id):
     post_data = request.form if request.form else request.get_json() or {}
     try:
@@ -186,7 +179,6 @@ def update_wizard(wizard_id):
     return jsonify({"message": "wizard updated", "result": wizard_result}), 200
 
 
-@wizards_bp.route("/wizard/delete/<wizard_id>", methods=["DELETE"])
 def delete_wizard(wizard_id):
     try:
         wizard_uuid = uuid.UUID(wizard_id)
@@ -209,7 +201,6 @@ def delete_wizard(wizard_id):
     return jsonify({"message": "wizard and related records deleted"}), 200
 
 
-@wizards_bp.route("/wizard/specialize", methods=["POST"])
 def create_specialization():
     post_data = request.form if request.form else request.get_json() or {}
     fields = ["wizard_id", "spell_id", "proficiency_level", "date_learned"]

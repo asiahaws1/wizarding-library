@@ -1,14 +1,11 @@
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from db import db
 from models.books import Book
 
-books_bp = Blueprint("books", __name__)
 
-
-@books_bp.route("/book", methods=["POST"])
 def create_book():
     post_data = request.form if request.form else request.get_json() or {}
     fields = ["school_id", "title", "author", "subject", "rarity_level", "magical_properties", "available"]
@@ -51,7 +48,6 @@ def create_book():
     return jsonify({"message": "book created", "result": book_result}), 201
 
 
-@books_bp.route("/books", methods=["GET"])
 def get_books():
     query = db.session.query(Book).all()
     books = []
@@ -71,7 +67,6 @@ def get_books():
     return jsonify({"message": "books found", "results": books}), 200
 
 
-@books_bp.route("/books/available", methods=["GET"])
 def get_available_books():
     query = db.session.query(Book).filter(Book.available == True).all()
     books = []
@@ -91,7 +86,6 @@ def get_available_books():
     return jsonify({"message": "available books found", "results": books}), 200
 
 
-@books_bp.route("/book/<book_id>", methods=["PUT"])
 def update_book(book_id):
     post_data = request.form if request.form else request.get_json() or {}
     try:
@@ -133,7 +127,6 @@ def update_book(book_id):
     return jsonify({"message": "book updated", "result": book_result}), 200
 
 
-@books_bp.route("/book/delete/<book_id>", methods=["DELETE"])
 def delete_book(book_id):
     try:
         book_uuid = uuid.UUID(book_id)

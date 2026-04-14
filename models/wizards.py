@@ -10,19 +10,16 @@ class Wizard(db.Model):
     wizard_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     school_id = db.Column(
         UUID(as_uuid=True),
-        db.ForeignKey("magical_schools.school_id"),
+        db.ForeignKey("schools.school_id"),
     )
-    wizard_name = db.Column(db.String(255), unique=True, nullable=False)
-    house = db.Column(db.String(255))
+    wizard_name = db.Column(db.String(), unique=True, nullable=False)
+    house = db.Column(db.String())
     year_enrolled = db.Column(db.Integer)
     magical_power_level = db.Column(db.Integer)
-    active = db.Column(db.Boolean, default=True)
+    active = db.Column(db.Boolean(), default=True)
 
-    school = db.relationship("MagicalSchool", back_populates="wizards")
-    specializations = db.relationship(
-        "WizardSpecialization",
-        back_populates="wizard",
-    )
+    school = db.relationship("School", back_populates="wizards")
+    specializations = db.relationship("WizardSpecialization", back_populates="wizard")
     spells = db.relationship(
         "Spell",
         secondary="wizard_specializations",

@@ -1,15 +1,12 @@
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from db import db
 from models.spells import Spell
 from models.wizard_specializations import WizardSpecialization
 
-spells_bp = Blueprint("spells", __name__)
 
-
-@spells_bp.route("/spell", methods=["POST"])
 def create_spell():
     post_data = request.form if request.form else request.get_json() or {}
     fields = ["spell_name", "incantation", "difficulty_level", "spell_type", "description"]
@@ -44,7 +41,6 @@ def create_spell():
     return jsonify({"message": "spell created", "result": spell_result}), 201
 
 
-@spells_bp.route("/spells", methods=["GET"])
 def get_spells():
     query = db.session.query(Spell).all()
     spells = []
@@ -62,7 +58,6 @@ def get_spells():
     return jsonify({"message": "spells found", "results": spells}), 200
 
 
-@spells_bp.route("/spells/<difficulty_level>", methods=["GET"])
 def get_spells_by_difficulty(difficulty_level):
     try:
         difficulty_value = float(difficulty_level)
@@ -84,7 +79,6 @@ def get_spells_by_difficulty(difficulty_level):
     return jsonify({"message": "spells found", "results": spells}), 200
 
 
-@spells_bp.route("/spell/<spell_id>", methods=["PUT"])
 def update_spell(spell_id):
     post_data = request.form if request.form else request.get_json() or {}
     try:
@@ -116,7 +110,6 @@ def update_spell(spell_id):
     return jsonify({"message": "spell updated", "result": spell_result}), 200
 
 
-@spells_bp.route("/spell/delete/<spell_id>", methods=["DELETE"])
 def delete_spell(spell_id):
     try:
         spell_uuid = uuid.UUID(spell_id)

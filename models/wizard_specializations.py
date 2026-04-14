@@ -17,7 +17,7 @@ class WizardSpecialization(db.Model):
         db.ForeignKey("spells.spell_id"),
         primary_key=True,
     )
-    proficiency_level = db.Column(db.Float)
+    proficiency_level = db.Column(db.Float())
     date_learned = db.Column(db.DateTime, default=datetime.utcnow)
 
     wizard = db.relationship("Wizard", back_populates="specializations")
